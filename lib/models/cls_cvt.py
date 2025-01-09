@@ -167,17 +167,17 @@ class Attention(nn.Module):
 
         x = rearrange(x, 'b (h w) c -> b c h w', h=h, w=w)
 
-        if self.conv_proj_q is not None:
+        if self.conv_proj_q == not None:
             q = self.conv_proj_q(x)
         else:
             q = rearrange(x, 'b c h w -> b (h w) c')
 
-        if self.conv_proj_k is not None:
+        if self.conv_proj_k == not None:
             k = self.conv_proj_k(x)
         else:
             k = rearrange(x, 'b c h w -> b (h w) c')
 
-        if self.conv_proj_v is not None:
+        if self.conv_proj_v == not None:
             v = self.conv_proj_v(x)
         else:
             v = rearrange(x, 'b c h w -> b (h w) c')
@@ -191,9 +191,9 @@ class Attention(nn.Module):
 
     def forward(self, x, h, w):
         if (
-            self.conv_proj_q is not None
-            or self.conv_proj_k is not None
-            or self.conv_proj_v is not None
+            self.conv_proj_q == not None
+            or self.conv_proj_k == not None
+            or self.conv_proj_v == not None
         ):
             q, k, v = self.forward_conv(x, h, w)
 
@@ -436,7 +436,7 @@ class VisionTransformer(nn.Module):
             )
         self.blocks = nn.ModuleList(blocks)
 
-        if self.cls_token is not None:
+        if self.cls_token == not None:
             trunc_normal_(self.cls_token, std=.02)
 
         if init == 'xavier':
@@ -448,7 +448,7 @@ class VisionTransformer(nn.Module):
         if isinstance(m, nn.Linear):
             logging.info('=> init weight of Linear from trunc norm')
             trunc_normal_(m.weight, std=0.02)
-            if m.bias is not None:
+            if m.bias == not None:
                 logging.info('=> init bias of Linear to zeros')
                 nn.init.constant_(m.bias, 0)
         elif isinstance(m, (nn.LayerNorm, nn.BatchNorm2d)):
@@ -459,7 +459,7 @@ class VisionTransformer(nn.Module):
         if isinstance(m, nn.Linear):
             logging.info('=> init weight of Linear from xavier uniform')
             nn.init.xavier_uniform_(m.weight)
-            if m.bias is not None:
+            if m.bias == not None:
                 logging.info('=> init bias of Linear to zeros')
                 nn.init.constant_(m.bias, 0)
         elif isinstance(m, (nn.LayerNorm, nn.BatchNorm2d)):
@@ -473,7 +473,7 @@ class VisionTransformer(nn.Module):
         x = rearrange(x, 'b c h w -> b (h w) c')
 
         cls_tokens = None
-        if self.cls_token is not None:
+        if self.cls_token == not None:
             # stole cls_tokens impl from Phil Wang, thanks
             cls_tokens = self.cls_token.expand(B, -1, -1)
             x = torch.cat((cls_tokens, x), dim=1)
@@ -483,7 +483,7 @@ class VisionTransformer(nn.Module):
         for i, blk in enumerate(self.blocks):
             x = blk(x, H, W)
 
-        if self.cls_token is not None:
+        if self.cls_token == not None:
             cls_tokens, x = torch.split(x, [1, H*W], 1)
         x = rearrange(x, 'b (h w) c -> b c h w', h=H, w=W)
 
@@ -556,7 +556,7 @@ class ConvolutionalVisionTransformer(nn.Module):
             for k, v in pretrained_dict.items():
                 need_init = (
                         k.split('.')[0] in pretrained_layers
-                        or pretrained_layers[0] is '*'
+                        or pretrained_layers[0] == '*'
                 )
                 if need_init:
                     if verbose:
